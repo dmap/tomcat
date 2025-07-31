@@ -1060,14 +1060,12 @@ class Generator {
         @Override
         public void visit(Node.ELExpression n) throws JasperException {
             n.setBeginJavaLine(out.getJavaLine());
-            final String expression;
+            final String expression = elInterpreter.interpreterCall(ctxt, this.isTagFile, n.getType() + "{" + n.getText() + "}", String.class, n.getEL().getMapName());
 			if (pageInfo.isEscapePageEL()) {
-	            expression = n.getType() + "{fn:escapeXml(" + n.getText() + ")}";
+				out.printil("org.apache.jasper.tagplugins.jstl.core.Out.output(out, null, (" + expression + "), null, true);");
 			} else {
-	            expression = n.getType() + "{" + n.getText() + "}";
+				out.printil("out.write(" + expression + ");");
 			}
-			out.printil("out.write(" + elInterpreter.interpreterCall(ctxt, this.isTagFile,
-                    expression, String.class, n.getEL().getMapName()) + ");");
             n.setEndJavaLine(out.getJavaLine());
         }
 

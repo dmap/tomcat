@@ -679,11 +679,7 @@ class Validator {
             // build expression
             StringBuilder expr = this.getBuffer();
             expr.append(n.getType()).append('{');
-			if (pageInfo.isEscapePageEL()) {
-				expr.append("fn:escapeXml(").append(n.getText()).append(")");
-			} else {
-				expr.append(n.getText());
-			}
+			expr.append(n.getText());
             expr.append('}');
             ELNode.Nodes el = ELParser.parse(expr.toString(), pageInfo.isDeferredSyntaxAllowedAsLiteral());
 
