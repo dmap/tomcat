@@ -73,7 +73,8 @@ public class PageInfo {
     private boolean isELIgnored = false;
     
     private String isEscapePageELValue;
-    private boolean isEscapePageEL = true;
+    private Boolean isEscapePageEL = null;
+    private boolean defaultIsEscapePageEL = false;
 
     // JSP 2.1
     private String deferredSyntaxAllowedAsLiteralValue;
@@ -430,10 +431,30 @@ public class PageInfo {
      */
     public void setContentType(String value) {
         contentType = value;
+        defaultIsEscapePageEL = shouldEscapeXMLForContentType(value);
     }
 
     public String getContentType() {
         return contentType;
+    }
+
+    private static boolean shouldEscapeXMLForContentType(String contentType) {
+        if (contentType == null) {
+            return false;
+        }
+        /* Trim mime type params e.g. charset */
+        final int paramSep = contentType.indexOf(';');
+        if (paramSep >= 0) {
+            contentType = contentType.substring(0, paramSep);
+        }
+        /* Find mime subType */
+        final int typeSep = contentType.indexOf('/');
+        if (typeSep < 0) {
+            return false;
+        }
+        final String subType = contentType.substring(typeSep + 1).toLowerCase();
+        /* We escape for HTML and XML content types */
+        return subType.equals("html") || subType.equals("xml") || subType.endsWith("+xml");
     }
 
 
@@ -627,9 +648,9 @@ public class PageInfo {
     public void setIsEscapePageEL(String value, Node n, ErrorDispatcher err, boolean pagedir) throws JasperException {
 
         if ("true".equalsIgnoreCase(value)) {
-        	isEscapePageEL = true;
+            isEscapePageEL = Boolean.TRUE;
         } else if ("false".equalsIgnoreCase(value)) {
-        	isEscapePageEL = false;
+            isEscapePageEL = Boolean.FALSE;
         } else {
             if (pagedir) {
                 err.jspError(n, "jsp.error.page.invalid.isescapepageel");
@@ -642,7 +663,7 @@ public class PageInfo {
     }
 
     public void setEscapePageEL(boolean s) {
-    	isEscapePageEL = s;
+        isEscapePageEL = s;
     }
 
     public String getIsEscapePageEL() {
@@ -650,7 +671,10 @@ public class PageInfo {
     }
 
     public boolean isEscapePageEL() {
-        return isEscapePageEL;
+        if (isEscapePageEL != null) {
+            return isEscapePageEL.booleanValue();
+        }
+        return defaultIsEscapePageEL;
     }
 
 
