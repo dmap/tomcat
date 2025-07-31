@@ -71,6 +71,9 @@ public class PageInfo {
 
     private String isELIgnoredValue;
     private boolean isELIgnored = false;
+    
+    private String isEscapePageELValue;
+    private boolean isEscapePageEL = true;
 
     // JSP 2.1
     private String deferredSyntaxAllowedAsLiteralValue;
@@ -616,6 +619,38 @@ public class PageInfo {
         }
 
         isELIgnoredValue = value;
+    }
+
+    /*
+     * isEscapePageEL
+     */
+    public void setIsEscapePageEL(String value, Node n, ErrorDispatcher err, boolean pagedir) throws JasperException {
+
+        if ("true".equalsIgnoreCase(value)) {
+        	isEscapePageEL = true;
+        } else if ("false".equalsIgnoreCase(value)) {
+        	isEscapePageEL = false;
+        } else {
+            if (pagedir) {
+                err.jspError(n, "jsp.error.page.invalid.isescapepageel");
+            } else {
+                err.jspError(n, "jsp.error.tag.invalid.isescapepageel");
+            }
+        }
+
+        isEscapePageELValue = value;
+    }
+
+    public void setEscapePageEL(boolean s) {
+    	isEscapePageEL = s;
+    }
+
+    public String getIsEscapePageEL() {
+        return isEscapePageELValue;
+    }
+
+    public boolean isEscapePageEL() {
+        return isEscapePageEL;
     }
 
 
