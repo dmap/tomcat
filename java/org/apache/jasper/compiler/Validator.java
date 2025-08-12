@@ -676,6 +676,19 @@ class Validator {
                 }
             }
 
+            boolean encoded = false;
+            for (final String encodeFunction: pageInfo.getEncodeFunctions()) {
+                if (n.getText().startsWith(encodeFunction+"(")) {
+                    encoded = true;
+                    break;
+                }
+            }
+            n.setEncoded(encoded);
+
+            if (!encoded) {
+                err.jspError(n.getStart(), "jsp.error.no.scriptlets");
+            }
+
             // build expression
             StringBuilder expr = this.getBuffer();
             expr.append(n.getType()).append('{');

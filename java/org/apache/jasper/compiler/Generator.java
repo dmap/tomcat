@@ -1061,7 +1061,7 @@ class Generator {
         public void visit(Node.ELExpression n) throws JasperException {
             n.setBeginJavaLine(out.getJavaLine());
             final String expression = elInterpreter.interpreterCall(ctxt, this.isTagFile, n.getType() + "{" + n.getText() + "}", String.class, n.getEL().getMapName());
-			if (pageInfo.isEscapePageEL()) {
+			if (!n.isEncoded() && pageInfo.isEscapePageEL()) {
 				out.printil("out.write(org.apache.jasper.tagplugins.jstl.Util.escapeXml(" + expression + "));");
 			} else {
 				out.printil("out.write(" + expression + ");");

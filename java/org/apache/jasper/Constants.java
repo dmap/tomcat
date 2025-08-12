@@ -32,6 +32,11 @@ public class Constants {
             List.of("jakarta.servlet.*", "jakarta.servlet.http.*", "jakarta.servlet.jsp.*");
 
     /**
+     * The allowed standard encode functions.
+     */
+    public static final List<String> STANDARD_ENCODE_FUNCTIONS = List.of("fn:escapeXml");
+
+    /**
      * Default size of the JSP buffer.
      */
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;

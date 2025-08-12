@@ -107,6 +107,8 @@ public class PageInfo {
 
     private final boolean isTagFile;
 
+    private Collection<String> encodeFunctions;
+
     PageInfo(BeanRepository beanRepository, JspCompilationContext ctxt) {
         isTagFile = ctxt.isTagFile();
         jspFile = ctxt.getJspFile();
@@ -125,6 +127,8 @@ public class PageInfo {
 
         // Enter standard imports
         this.imports = new ArrayList<>(Constants.STANDARD_IMPORTS);
+
+        this.encodeFunctions = new ArrayList<>(Constants.STANDARD_ENCODE_FUNCTIONS);
     }
 
     public boolean isTagFile() {
@@ -156,6 +160,18 @@ public class PageInfo {
 
     public List<String> getImports() {
         return imports;
+    }
+
+    public void addEncodeFunctions(Collection<String> functions) {
+        this.encodeFunctions.addAll(functions);
+    }
+
+    public void addEncodeFunctions(String f) {
+        this.encodeFunctions.add(f);
+    }
+
+    public Collection<String> getEncodeFunctions() {
+        return this.encodeFunctions;
     }
 
     public String getJspFile() {

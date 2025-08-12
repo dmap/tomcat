@@ -869,6 +869,8 @@ public abstract class Node implements TagConstants {
 
         private ELNode.Nodes el;
 
+        private boolean encoded;
+
         private final char type;
 
         ELExpression(char type, String text, Mark start, Node parent) {
@@ -887,6 +889,14 @@ public abstract class Node implements TagConstants {
 
         public ELNode.Nodes getEL() {
             return el;
+        }
+
+        public void setEncoded(boolean encoded) {
+            this.encoded = encoded;
+        }
+
+        public boolean isEncoded() {
+            return this.encoded;
         }
 
         public char getType() {
