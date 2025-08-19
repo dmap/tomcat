@@ -869,7 +869,9 @@ public abstract class Node implements TagConstants {
 
         private ELNode.Nodes el;
 
-        private boolean encoded;
+        private String expression;
+
+        private String encodeFunction;
 
         private final char type;
 
@@ -891,17 +893,25 @@ public abstract class Node implements TagConstants {
             return el;
         }
 
-        public void setEncoded(boolean encoded) {
-            this.encoded = encoded;
-        }
-
-        public boolean isEncoded() {
-            return this.encoded;
-        }
-
         public char getType() {
             return this.type;
         }
+
+		public String getExpression() {
+			return expression;
+		}
+
+		public void setExpression(String expression) {
+			this.expression = expression;
+		}
+
+		public String getEncodeFunction() {
+			return encodeFunction;
+		}
+
+		public void setEncodeFunction(String encodeFunction) {
+			this.encodeFunction = encodeFunction;
+		}
     }
 
     /**

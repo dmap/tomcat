@@ -107,7 +107,7 @@ public class PageInfo {
 
     private final boolean isTagFile;
 
-    private Collection<String> encodeFunctions;
+    private Map<String, String> encodeFunctions;
 
     PageInfo(BeanRepository beanRepository, JspCompilationContext ctxt) {
         isTagFile = ctxt.isTagFile();
@@ -128,7 +128,7 @@ public class PageInfo {
         // Enter standard imports
         this.imports = new ArrayList<>(Constants.STANDARD_IMPORTS);
 
-        this.encodeFunctions = new ArrayList<>(Constants.STANDARD_ENCODE_FUNCTIONS);
+        this.encodeFunctions = new HashMap<>(Constants.STANDARD_ENCODE_FUNCTIONS);
     }
 
     public boolean isTagFile() {
@@ -162,15 +162,11 @@ public class PageInfo {
         return imports;
     }
 
-    public void addEncodeFunctions(Collection<String> functions) {
-        this.encodeFunctions.addAll(functions);
+    public void addEncodeFunction(String elFunction, String replacementFunction) {
+        this.encodeFunctions.put(elFunction, replacementFunction);
     }
 
-    public void addEncodeFunctions(String f) {
-        this.encodeFunctions.add(f);
-    }
-
-    public Collection<String> getEncodeFunctions() {
+    public Map<String, String> getEncodeFunctions() {
         return this.encodeFunctions;
     }
 

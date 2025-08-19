@@ -676,23 +676,27 @@ class Validator {
                 }
             }
 
-            boolean encoded = false;
-            for (final String encodeFunction: pageInfo.getEncodeFunctions()) {
-                if (n.getText().startsWith(encodeFunction+"(")) {
-                    encoded = true;
+            Map.Entry<String, String> encodeFunction = null;
+            for (final Map.Entry<String, String> e: pageInfo.getEncodeFunctions().entrySet()) {
+                if (n.getText().startsWith(e.getKey() + "(") && n.getText().endsWith(")")) {
+                    encodeFunction = e;
                     break;
                 }
             }
-            n.setEncoded(encoded);
 
-            if (!encoded) {
-                err.jspError(n.getStart(), "jsp.error.no.scriptlets");
+            if (encodeFunction == null && pageInfo.isEscapePageEL()) {
+                err.jspError(n.getStart(), "jsp.error.not.encoded");
             }
+            
 
             // build expression
             StringBuilder expr = this.getBuffer();
             expr.append(n.getType()).append('{');
-			expr.append(n.getText());
+            if (!encodeFunction.getValue().isEmpty()) {
+                expr.append(n.getText().substring(encodeFunction.getKey().length() + 1, n.getText().length() - 1));
+            } else {
+                expr.append(n.getText());
+            }
             expr.append('}');
             ELNode.Nodes el = ELParser.parse(expr.toString(), pageInfo.isDeferredSyntaxAllowedAsLiteral());
 
@@ -701,6 +705,8 @@ class Validator {
 
             // store it
             n.setEL(el);
+            n.setExpression(expr.toString());
+            n.setEncodeFunction(encodeFunction.getValue());
         }
 
         @Override
