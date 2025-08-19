@@ -244,12 +244,6 @@ class Validator {
                     } else if (!pageInfo.getIsELIgnored().equals(value)) {
                         err.jspError(n, "jsp.error.tag.conflict.iselignored", pageInfo.getIsELIgnored(), value);
                     }
-                } else if ("isEscapePageEL".equals(attr)) {
-                    if (pageInfo.getIsEscapePageEL() == null) {
-                        pageInfo.setIsEscapePageEL(value, n, err, false);
-                    } else if (!pageInfo.getIsEscapePageEL().equals(value)) {
-                        err.jspError(n, "jsp.error.tag.conflict.escapepageel", pageInfo.getIsEscapePageEL(), value);
-                    }
                 } else if ("errorOnELNotFound".equals(attr)) {
                     if (pageInfo.getErrorOnELNotFound() == null) {
                         pageInfo.setErrorOnELNotFound(value, n, err, false);
