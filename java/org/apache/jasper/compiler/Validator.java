@@ -679,7 +679,7 @@ class Validator {
             }
 
             if (encodeFunction == null && pageInfo.isEscapePageEL()) {
-                err.jspError(n.getStart(), "jsp.error.not.encoded");
+                err.jspError(n, "jsp.error.not.encoded");
             }
             
 
