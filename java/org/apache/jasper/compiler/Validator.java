@@ -686,7 +686,7 @@ class Validator {
             // build expression
             StringBuilder expr = this.getBuffer();
             expr.append(n.getType()).append('{');
-            if (!encodeFunction.getValue().isEmpty()) {
+            if (encodeFunction != null && !encodeFunction.getValue().isEmpty()) {
                 expr.append(n.getText().substring(encodeFunction.getKey().length() + 1, n.getText().length() - 1));
             } else {
                 expr.append(n.getText());
@@ -700,7 +700,7 @@ class Validator {
             // store it
             n.setEL(el);
             n.setExpression(expr.toString());
-            n.setEncodeFunction(encodeFunction.getValue());
+            n.setEncodeFunction(encodeFunction == null ? "" : encodeFunction.getValue());
         }
 
         @Override
