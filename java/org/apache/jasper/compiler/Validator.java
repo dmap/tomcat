@@ -41,6 +41,7 @@ import jakarta.servlet.jsp.tagext.TagInfo;
 import jakarta.servlet.jsp.tagext.TagLibraryInfo;
 import jakarta.servlet.jsp.tagext.ValidationMessage;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.ELNode.Text;
 import org.apache.jasper.el.ELContextImpl;
@@ -686,7 +687,7 @@ class Validator {
             // build expression
             StringBuilder expr = this.getBuffer();
             expr.append(n.getType()).append('{');
-            if (encodeFunction != null && !encodeFunction.getValue().isEmpty()) {
+            if (encodeFunction != null && !encodeFunction.getValue().equals(Constants.LEAVE_FUNCTION)) {
                 expr.append(n.getText().substring(encodeFunction.getKey().length() + 1, n.getText().length() - 1));
             } else {
                 expr.append(n.getText());
@@ -700,7 +701,7 @@ class Validator {
             // store it
             n.setEL(el);
             n.setExpression(expr.toString());
-            n.setEncodeFunction(encodeFunction == null ? "" : encodeFunction.getValue());
+            n.setEncodeFunction(encodeFunction == null || encodeFunction.getValue().equals(Constants.LEAVE_FUNCTION) ? "" : encodeFunction.getValue());
         }
 
         @Override
