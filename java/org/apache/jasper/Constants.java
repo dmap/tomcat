@@ -17,6 +17,7 @@
 package org.apache.jasper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Some constants and other global data that are used by the compiler and the runtime.
@@ -30,6 +31,16 @@ public class Constants {
      */
     public static final List<String> STANDARD_IMPORTS =
             List.of("jakarta.servlet.*", "jakarta.servlet.http.*", "jakarta.servlet.jsp.*");
+
+    /**
+     * Placeholder for use in STANDARD_ENCODE_FUNCTIONS to indicate the function should be left as is.
+     */
+    public static final String LEAVE_FUNCTION = "<leave>";
+    
+    /**
+     * The allowed standard encode functions.
+     */
+    public static final Map<String, String> STANDARD_ENCODE_FUNCTIONS = Map.of("enc:xml", "org.apache.jasper.tagplugins.jstl.Util.escapeXml", "enc:none", "", "fn:escapeXml", LEAVE_FUNCTION);
 
     /**
      * Default size of the JSP buffer.

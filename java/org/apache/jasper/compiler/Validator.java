@@ -41,6 +41,7 @@ import jakarta.servlet.jsp.tagext.TagInfo;
 import jakarta.servlet.jsp.tagext.TagLibraryInfo;
 import jakarta.servlet.jsp.tagext.ValidationMessage;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.ELNode.Text;
 import org.apache.jasper.el.ELContextImpl;
@@ -69,7 +70,8 @@ class Validator {
                         new JspUtil.ValidAttribute("isThreadSafe"), new JspUtil.ValidAttribute("info"),
                         new JspUtil.ValidAttribute("errorPage"), new JspUtil.ValidAttribute("isErrorPage"),
                         new JspUtil.ValidAttribute("contentType"), new JspUtil.ValidAttribute("pageEncoding"),
-                        new JspUtil.ValidAttribute("isELIgnored"), new JspUtil.ValidAttribute("errorOnELNotFound"),
+                        new JspUtil.ValidAttribute("isELIgnored"), new JspUtil.ValidAttribute("isEscapePageEL"), 
+                        new JspUtil.ValidAttribute("errorOnELNotFound"),
                         new JspUtil.ValidAttribute("deferredSyntaxAllowedAsLiteral"),
                         new JspUtil.ValidAttribute("trimDirectiveWhitespaces") };
 
@@ -151,6 +153,12 @@ class Validator {
                         pageInfo.setIsELIgnored(value, n, err, true);
                     } else if (!pageInfo.getIsELIgnored().equals(value)) {
                         err.jspError(n, "jsp.error.page.conflict.iselignored", pageInfo.getIsELIgnored(), value);
+                    }
+                } else if ("isEscapePageEL".equals(attr)) {
+                    if (pageInfo.getIsEscapePageEL() == null) {
+                        pageInfo.setIsEscapePageEL(value, n, err, true);
+                    } else if (!pageInfo.getIsEscapePageEL().equals(value)) {
+                        err.jspError(n, "jsp.error.page.conflict.escapepageel", pageInfo.getIsEscapePageEL(), value);
                     }
                 } else if ("errorOnELNotFound".equals(attr)) {
                     if (pageInfo.getErrorOnELNotFound() == null) {
@@ -663,9 +671,28 @@ class Validator {
                 }
             }
 
+            Map.Entry<String, String> encodeFunction = null;
+            for (final Map.Entry<String, String> e: pageInfo.getEncodeFunctions().entrySet()) {
+                if (n.getText().startsWith(e.getKey() + "(") && n.getText().endsWith(")")) {
+                    encodeFunction = e;
+                    break;
+                }
+            }
+
+            if (encodeFunction == null && pageInfo.isEscapePageEL()) {
+                err.jspError(n, "jsp.error.not.encoded");
+            }
+            
+
             // build expression
             StringBuilder expr = this.getBuffer();
-            expr.append(n.getType()).append('{').append(n.getText()).append('}');
+            expr.append(n.getType()).append('{');
+            if (encodeFunction != null && !encodeFunction.getValue().equals(Constants.LEAVE_FUNCTION)) {
+                expr.append(n.getText().substring(encodeFunction.getKey().length() + 1, n.getText().length() - 1));
+            } else {
+                expr.append(n.getText());
+            }
+            expr.append('}');
             ELNode.Nodes el = ELParser.parse(expr.toString(), pageInfo.isDeferredSyntaxAllowedAsLiteral());
 
             // validate/prepare expression
@@ -673,6 +700,8 @@ class Validator {
 
             // store it
             n.setEL(el);
+            n.setExpression(expr.toString());
+            n.setEncodeFunction(encodeFunction == null || encodeFunction.getValue().equals(Constants.LEAVE_FUNCTION) ? "" : encodeFunction.getValue());
         }
 
         @Override

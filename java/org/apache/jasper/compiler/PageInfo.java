@@ -71,6 +71,10 @@ public class PageInfo {
 
     private String isELIgnoredValue;
     private boolean isELIgnored = false;
+    
+    private String isEscapePageELValue;
+    private Boolean isEscapePageEL = null;
+    private boolean defaultIsEscapePageEL = false;
 
     // JSP 2.1
     private String deferredSyntaxAllowedAsLiteralValue;
@@ -103,6 +107,8 @@ public class PageInfo {
 
     private final boolean isTagFile;
 
+    private Map<String, String> encodeFunctions;
+
     PageInfo(BeanRepository beanRepository, JspCompilationContext ctxt) {
         isTagFile = ctxt.isTagFile();
         jspFile = ctxt.getJspFile();
@@ -121,6 +127,8 @@ public class PageInfo {
 
         // Enter standard imports
         this.imports = new ArrayList<>(Constants.STANDARD_IMPORTS);
+
+        this.encodeFunctions = new HashMap<>(Constants.STANDARD_ENCODE_FUNCTIONS);
     }
 
     public boolean isTagFile() {
@@ -152,6 +160,14 @@ public class PageInfo {
 
     public List<String> getImports() {
         return imports;
+    }
+
+    public void addEncodeFunction(String elFunction, String replacementFunction) {
+        this.encodeFunctions.put(elFunction, replacementFunction);
+    }
+
+    public Map<String, String> getEncodeFunctions() {
+        return this.encodeFunctions;
     }
 
     public String getJspFile() {
@@ -427,10 +443,30 @@ public class PageInfo {
      */
     public void setContentType(String value) {
         contentType = value;
+        defaultIsEscapePageEL = shouldEscapeXMLForContentType(value);
     }
 
     public String getContentType() {
         return contentType;
+    }
+
+    private static boolean shouldEscapeXMLForContentType(String contentType) {
+        if (contentType == null) {
+            return false;
+        }
+        /* Trim mime type params e.g. charset */
+        final int paramSep = contentType.indexOf(';');
+        if (paramSep >= 0) {
+            contentType = contentType.substring(0, paramSep);
+        }
+        /* Find mime subType */
+        final int typeSep = contentType.indexOf('/');
+        if (typeSep < 0) {
+            return false;
+        }
+        final String subType = contentType.substring(typeSep + 1).toLowerCase();
+        /* We escape for HTML and XML content types */
+        return subType.equals("html") || subType.equals("xml") || subType.endsWith("+xml");
     }
 
 
@@ -616,6 +652,41 @@ public class PageInfo {
         }
 
         isELIgnoredValue = value;
+    }
+
+    /*
+     * isEscapePageEL
+     */
+    public void setIsEscapePageEL(String value, Node n, ErrorDispatcher err, boolean pagedir) throws JasperException {
+
+        if ("true".equalsIgnoreCase(value)) {
+            isEscapePageEL = Boolean.TRUE;
+        } else if ("false".equalsIgnoreCase(value)) {
+            isEscapePageEL = Boolean.FALSE;
+        } else {
+            if (pagedir) {
+                err.jspError(n, "jsp.error.page.invalid.isescapepageel");
+            } else {
+                err.jspError(n, "jsp.error.tag.invalid.isescapepageel");
+            }
+        }
+
+        isEscapePageELValue = value;
+    }
+
+    public void setEscapePageEL(boolean s) {
+        isEscapePageEL = s;
+    }
+
+    public String getIsEscapePageEL() {
+        return isEscapePageELValue;
+    }
+
+    public boolean isEscapePageEL() {
+        if (isEscapePageEL != null) {
+            return isEscapePageEL.booleanValue();
+        }
+        return defaultIsEscapePageEL;
     }
 
 
